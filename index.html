@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم مدیریت تسک</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header">
+                <div class="task-count">
+                    <span class="task-count-number">0</span>
+                    <span class="task-count-text">تسک</span>
+                </div>
+                <button class="add-task-btn">افزودن تسک جدید</button>
+                <button class="clear-completed-btn">حذف تکمیل شده‌ها</button>
+            </div>
+            
+            <div class="tasks-container">
+                <!-- Tasks will be dynamically added here -->
+            </div>
+
+            <div class="task-filters">
+                <button class="filter-btn" data-filter="incomplete">در حال انجام</button>
+                <button class="filter-btn active all" data-filter="all">همه</button>
+                <button class="filter-btn completed" data-filter="completed">تکمیل شده</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>تسک‌های تکمیل شده</h3>
+                    <div class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>تسک‌های در انتظار</h3>
+                    <div class="stat-number">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>کل مطالعه</h3>
+                    <div class="stat-number">0:00</div>
+                </div>
+                <div class="date-display">
+                    <div class="day">یکشنبه</div>
+                    <div class="full-date">۱۶ فروردین ۱۴۰۴</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="user-info">
+                <h2 id="username">کاربر</h2>
+                <button id="logout-btn" class="logout-btn">خروج</button>
+            </div>
+            <div class="search-box">
+                <input type="text" placeholder="جستجو" class="search-input">
+            </div>
+            <div class="users-list">
+                <h3>کاربران</h3>
+                <ul id="users-container">
+                    <!-- لیست کاربران به صورت پویا اینجا اضافه می‌شود -->
+                    <li class="loading-users">در حال بارگذاری کاربران...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Creation Modal -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content">
+            <h2>CREATE TASK</h2>
+            <input type="text" placeholder="Task description..." class="task-input">
+            
+            <div class="divider">
+                <span>Importance</span>
+            </div>
+            
+            <div class="form-section">
+                <div class="datetime-container">
+                    <div class="date-picker">
+                        <div class="date-picker-header">
+                            <h4>datePicker</h4>
+                            <div class="month-selector">
+                                <span class="current-month">Nov 2023</span>
+                                <div class="month-nav">
+                                    <button class="nav-btn prev">&lt;</button>
+                                    <button class="nav-btn next">&gt;</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="calendar">
+                            <div class="weekdays">
+                                <span>Mon</span>
+                                <span>Tue</span>
+                                <span>Wed</span>
+                                <span>Thu</span>
+                                <span>Fri</span>
+                                <span>Sat</span>
+                                <span>Sun</span>
+                            </div>
+                            <div class="days">
+                                <!-- Days will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="time-selectors">
+                        <div class="time-picker">
+                            <label>Select Time Start</label>
+                            <div class="time-input-container">
+                                <div class="time-inputs">
+                                    <select class="hour-select"></select>
+                                    <span>:</span>
+                                    <select class="minute-select"></select>
+                                </div>
+                                <select class="ampm-select">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                                <button class="ok-btn">OK</button>
+                            </div>
+                        </div>
+
+                        <div class="time-picker">
+                            <label>Select Time End</label>
+                            <div class="time-input-container">
+                                <div class="time-inputs">
+                                    <select class="hour-select"></select>
+                                    <span>:</span>
+                                    <select class="minute-select"></select>
+                                </div>
+                                <select class="ampm-select">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                                <button class="ok-btn">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="divider">
+                <span>Importance</span>
+            </div>
+            
+            <div class="importance-selector">
+                <button class="importance-btn score1">1 score</button>
+                <button class="importance-btn score2">2 score</button>
+                <button class="importance-btn score3">3 score</button>
+            </div>
+
+            <button class="submit-task-btn">SUBMIT TASK</button>
+        </div>
+    </div>
+
+    <!-- Daily Tasks Overlay -->
+    <div class="daily-tasks-overlay" id="dailyTasksOverlay">
+        <div class="daily-tasks-content">
+            <div class="daily-tasks-header">
+                <h3>تسک‌های <span class="selected-date"></span></h3>
+                <button class="close-overlay">&times;</button>
+            </div>
+            <div class="daily-tasks-list">
+                <!-- Tasks will be populated here -->
+            </div>
+            <div class="daily-tasks-summary">
+                <div class="summary-item">
+                    <span class="label">کل تسک‌ها:</span>
+                    <span class="total-count">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">تکمیل شده:</span>
+                    <span class="completed-count">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">در انتظار:</span>
+                    <span class="pending-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Enable detailed error logging
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error:', { message, source, lineno, colno, error });
+            return false;
+        };
+        
+        // Initialize Supabase client
+        const supabaseUrl = 'https://lholzspyazziknxqopmi.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxob2x6c3B5YXp6aWtueHFvcG1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIwMjc0MTAsImV4cCI6MjA1NzYwMzQxMH0.uku06OF-WapBhuV-A_rJBXu3x24CKKkSTM0SnmPIOOE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                console.log('Checking authentication...');
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    console.error('Error checking auth:', error);
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                if (user) {
+                    console.log('User authenticated:', user);
+                    const username = user.user_metadata.username || user.email;
+                    document.getElementById('username').textContent = username;
+                } else {
+                    console.log('No user logged in, redirecting to login');
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Error checking auth:', error);
+                window.location.href = '/login.html';
+            }
+        }
+        
+        // Logout function
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await supabase.auth.signOut();
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>
